@@ -1,0 +1,31 @@
+apiVersion: v2
+name: ode-ess-status-consumer
+version: 0.1.0
+description: ODE ESS Status Consumer - A Helm chart for Kubernetes, optimized for services with dynamic configuration and secure connections.
+
+# Replace with the actual project URL
+home: http://example.com/
+
+# Maintainers - replace with actual maintainers' information
+maintainers:
+  - name: Maintainer Name
+    email: maintainer.email@example.com
+    url: http://maintainer.example.com/
+
+keywords:
+  - kubernetes
+  - deployment
+  - configmap
+  - service
+  - ingress
+  - kafka
+  - authentication
+
+appVersion: "1.16.0" # Update this to match the version of your application
+
+# Specify any dependencies here
+dependencies:
+  # Example dependency
+  # - name: nginx
+  #   version: "1.16.0"
+  #   repository: "http://charts.example.com/"

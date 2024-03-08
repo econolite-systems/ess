@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<!-- SPDX-License-Identifier: MIT -->
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Econolite.Ode.Models.Ess</RootNamespace>
+    <Copyright>2023-&lt;&lt;CURRENT_YEAR&gt;&gt; Econolite Systems, Inc.</Copyright>
+</PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SolutionDir)\common\Messaging\Messaging.csproj" />
+        <ProjectReference Include="$(SolutionDir)\device-manager\Models.DeviceManager.Mapster\Models.DeviceManager.Mapster.csproj" />
+        <ProjectReference Include="$(SolutionDir)\entities\Models.Entities\Models.Entities.csproj" />
+        <ProjectReference Include="$(SolutionDir)\status\Status.Ess\Status.Ess.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Mapster" Version="7.3.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+    <Target Name="Mapster" AfterTargets="AfterBuild">
+        <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+        <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster model -a $(TargetDir)$(ProjectName).dll -n Econolite.Ode.Models.Ess.Dto -o ../Models.Ess.Generated/Models -r" />
+<!--        <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster extension -a $(TargetDir)$(ProjectName).dll -n Econolite.Ode.Models.Ess.Dto -o Models" />-->
+<!--        <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster mapper -a $(TargetDir)$(ProjectName).dll -n Econolite.Ode.Models.Ess.Mappers -o Mappers" />-->
+    </Target>
+
+    <ItemGroup>
+        <Generated Include="**\*.g.cs" />
+    </ItemGroup>
+
+    <Target Name="CleanGenerated">
+        <Delete Files="@(Generated)" />
+    </Target>
+</Project>
+

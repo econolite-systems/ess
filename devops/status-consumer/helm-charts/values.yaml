@@ -1,0 +1,12 @@
+odeEssStatusConsumer:
+  name: ode-ess-status-consumer
+  imageRepository: cosysdev.azurecr.io/ode-ess-status-consumer
+  resources: {}
+  kafka:
+    groupId: 'ess.status.consumer'
+  ingress:
+    host: api.mound-rd.cosysdev.com
+  service:
+    port: 80
+  probes:
+    enabled: false

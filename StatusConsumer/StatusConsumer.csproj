@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+<!-- SPDX-License-Identifier: MIT -->
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>9833ac2a-61a0-4373-8f9d-a9c700966e4c</UserSecretsId>
+    <Copyright>2023-&lt;&lt;CURRENT_YEAR&gt;&gt; Econolite Systems, Inc.</Copyright>
+</PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SolutionDir)\common\Extensions.AspNet\Extensions.AspNet.csproj" />
+        <ProjectReference Include="$(SolutionDir)\common\Monitoring.HealthChecks.Redis\Monitoring.HealthChecks.Redis.csproj" />
+        <ProjectReference Include="$(SolutionDir)\status\Status.Ess.Cache\Status.Ess.Cache.csproj" />
+        <ProjectReference Include="$(SolutionDir)\status\Status.Ess.Messaging\Status.Ess.Messaging.csproj" />
+    </ItemGroup>
+
+
+</Project>
+

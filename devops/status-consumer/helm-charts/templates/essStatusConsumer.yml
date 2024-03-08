@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.odeEssStatusConsumer.name }}
+data:
+  appsettings.Production.json: |
+    {
+      "Authentication": {
+          "Authority": "{{ .Values.url.identity }}"
+      },
+      "Kafka": {
+          "bootstrap": {
+              "servers": "{{ .Values.kafka.server }}"
+          },
+          "ssl": {
+            "ca": "{{.Values.kafka.ca}}",
+            "certificate": "{{.Values.kafka.certificate}}"
+          },
+          "sasl": {
+              "mechanism": "{{.Values.kafka.security.mechanism}}",
+              "username": "{{ .Values.kafka.userName }}"
+          },
+          "security": {
+              "protocol": "{{ .Values.kafka.security.protocol}}"
+          },
+          "groupId": "{{ .Values.odeEssStatusConsumer.kafka.groupId }}"
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.odeEssStatusConsumer.name }}
+  labels:
+    app: {{ .Values.odeEssStatusConsumer.name }}
+    chart: {{ .Values.odeEssStatusConsumer.name }}
+    release: {{ .Release.Name }}
+  annotations:
+ 
+spec:
+  revisionHistoryLimit: 0
+  replicas: {{ .Values.odeEssStatusConsumer.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ .Values.odeEssStatusConsumer.name }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.odeEssStatusConsumer.name }}
+        release: {{ .Release.Name }}
+      annotations:
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              release: {{ .Release.Name }}
+      imagePullSecrets:
+        - name: {{ .Values.secrets.imagePullSecret }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Values.odeEssStatusConsumer.name }}
+      containers:
+        - name: {{ .Values.odeEssStatusConsumer.name }}
+          image: "{{ .Values.odeEssStatusConsumer.imageRepository }}:{{ .Values.odeEssStatusConsumer.imageTag  }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: Kafka__sasl__password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.kafka.userName }}
+                  key: password        
+            - name: Redis__Connection
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cs
+                  key: RedisConnection
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cs
+                  key: password 
+          volumeMounts:
+            - name: config
+              mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
+              readOnly: true
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          {{- if .Values.odeEssStatusConsumer.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end }}
+          resources:
+{{ toYaml .Values.odeEssStatusConsumer.resources | indent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.odeEssStatusConsumer.name }}
+  labels:
+    app: {{ .Values.odeEssStatusConsumer.name }}
+    chart: {{ .Values.odeEssStatusConsumer.name }}
+    release: {{ .Release.Name }}
+ 
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.odeEssStatusConsumer.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Values.odeEssStatusConsumer.name }}
+    release: {{ .Release.Name }}
